@@ -119,7 +119,8 @@ export default function Index() {
   }
 
   return (
-    <View className='home-page' style={{ height: windowInfo.windowHeight }}>
+    // RN 使用导航容器分配的剩余高度，避免首页按整屏高度撑开后遮挡底部 Tab。
+    <View className='home-page' style={process.env.TARO_ENV === 'rn' ? { flex: 1 } : { height: windowInfo.windowHeight }}>
       {/* RN 状态栏采用深色文字，顶部安全区留在滚动容器外，防止商品滑到刘海下方。 */}
       <HomeStatusBar />
       {process.env.TARO_ENV === 'rn' && <View className='native-status-inset' style={{ height: windowInfo.statusBarHeight ?? 0 }} />}
@@ -202,9 +203,6 @@ export default function Index() {
           </View>
         </View>
       </ScrollView>
-
-      {/* 原生底部手势区保留背景留白，最后一排商品与系统返回手势保持间距。 */}
-      {process.env.TARO_ENV === 'rn' && <View className='native-bottom-inset' style={{ height: bottomInset }} />}
 
       {/* 有商品且抽屉关闭时显示购物车入口和数量角标。 */}
       {cartCount > 0 && !cartOpen && <View className='floating-cart' onClick={() => setCartOpen(true)} aria-label={`查看购物车，共${cartCount}件商品`}><Icon name='cart' className='floating-cart-icon' /><View className='cart-badge'><Text className='cart-badge-text'>{cartCount > 99 ? '99+' : cartCount}</Text></View></View>}

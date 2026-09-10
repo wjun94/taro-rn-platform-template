@@ -22,11 +22,6 @@
     background-color: #aa9a83;
 }
 
-.native-bottom-inset {
-    flex-shrink: 0;
-    background-color: @background;
-}
-
 .home-icon {
     width: 40px;
     height: 40px;
@@ -385,6 +380,9 @@
 }
 
 .group-card {
+    // 纵向 Flex 消除图片基线间隙，避免使用 RN Image 不支持的 vertical-align。
+    display: flex;
+    flex-direction: column;
     padding: 22px 20px 26px;
     background-color: #ffffff;
     border-bottom-width: 1px;
@@ -397,7 +395,6 @@
     height: 286px;
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
-    vertical-align: top;
 }
 
 .group-ribbon {
