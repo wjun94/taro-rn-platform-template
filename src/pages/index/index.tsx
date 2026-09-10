@@ -5,6 +5,7 @@ import { assets, categories, formatPrice, groupProducts, products, saleTabs, typ
 import { Icon, MemberPrice, ProductCard, ProductImage, type IconName } from './components'
 import { useHomeScroll } from './use-home-scroll'
 import HomeStatusBar from './home-status-bar'
+import { useCartStore } from '../../stores/cart'
 import './index.less'
 
 // 原生滚动属性仅传给 RN；Android 开启嵌套滚动，iOS 锁定手势方向，输入时仍可点击搜索。
@@ -41,7 +42,10 @@ export default function Index() {
   const [tag, setTag] = useState('全部')
   const [saleTab, setSaleTab] = useState(0)
   const { scrollProps, scrollTo, trackPosition } = useHomeScroll()
-  const [cart, setCart] = useState<Record<string, number>>({})
+  // Zustand 使用示例：分别订阅需要的状态与操作，避免每次选择时创建新的对象。
+  const cart = useCartStore(state => state.quantities)
+  const addItem = useCartStore(state => state.addItem)
+  const changeQuantity = useCartStore(state => state.changeQuantity)
   const [cartOpen, setCartOpen] = useState(false)
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [reservations, setReservations] = useState<string[]>([])
@@ -96,9 +100,9 @@ export default function Index() {
     scrollTo('home-categories')
   }
 
-  /** 本地购物车按商品 ID 合并数量，并显示即时反馈。 */
+  /** 调用 Zustand store 加购，页面只负责显示即时反馈。 */
   function addToCart(product: Product) {
-    setCart(current => ({ ...current, [product.id]: (current[product.id] || 0) + 1 }))
+    addItem(product.id)
     notify('已加入购物车')
   }
 
@@ -110,13 +114,8 @@ export default function Index() {
       notify('已预约，开团前记得回来看看')
       return
     }
-    setCart(current => ({ ...current, [product.id]: (current[product.id] || 0) + 1 }))
+    addItem(product.id)
     setCartOpen(true)
-  }
-
-  /** 数量减为零时移出展示列表，合计统一按分计算。 */
-  function changeQuantity(id: string, amount: number) {
-    setCart(current => ({ ...current, [id]: Math.max(0, (current[id] || 0) + amount) }))
   }
 
   return (
@@ -219,7 +218,7 @@ export default function Index() {
           <View className='cart-heading'><Text className='cart-heading-text'>购物车 · {cartCount}件</Text><View className='sheet-close' onClick={() => setCartOpen(false)} aria-label='关闭购物车'><Icon name='close' /></View></View>
           {/* 购物车商品独立纵向滚动，原生端使用相同的键盘与滚动条配置。 */}
           <ScrollView scrollY className='cart-list' {...nativeScrollOptions}>
-            {/* 数量全部减为零时显示空态；有商品时展示价格及增减数量操作。 */}
+            {/* 订阅 Zustand 购物车展示商品；加减按钮更新 store，数量清空后自动显示空态。 */}
             {cartItems.length === 0 && <Text className='cart-empty'>购物车还是空的，去挑选喜欢的好物吧</Text>}
             {cartItems.map(product => <View className='cart-item' key={product.id}>
               <ProductImage src={product.image} className='cart-product-image' />
