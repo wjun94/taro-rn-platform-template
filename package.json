@@ -31,7 +31,7 @@
     "dev:quickapp": "npm run build:quickapp -- --watch",
     "android": "node scripts/run-android.cjs",
     "build:android": "cd android && ./gradlew app:assembleRelease",
-    "ios": "react-native run-ios",
+    "ios": "pod-install && react-native run-ios",
     "start": "react-native start --custom-log-reporter-path @tarojs/rn-supporter/TerminalReporter.js",
     "podInstall": "pod-install",
     "upgradePeerdeps": "install-peerdeps @tarojs/taro-rn@4.2.1 -o -P && install-peerdeps @tarojs/components-rn@4.2.1 -o -P && install-peerdeps @tarojs/router-rn@4.2.1 -o -P && pod-install"

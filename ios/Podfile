@@ -60,5 +60,15 @@ target 'taroDemo' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
+
+    # RN 0.73 安装 Pods 时会创建空的 Codegen 占位文件；pnpm 更换依赖目录后，
+    # Xcode 可能沿用旧日志并跳过生成。每次执行这两个生成阶段，确保原生编译前有完整定义。
+    installer.pods_project.targets.each do |target|
+      next unless ['React-rncore', 'FBReactNativeSpec'].include?(target.name)
+
+      target.shell_script_build_phases.each do |phase|
+        phase.always_out_of_date = '1' if phase.name == '[CP-User] Generate Specs'
+      end
+    end
   end
 end

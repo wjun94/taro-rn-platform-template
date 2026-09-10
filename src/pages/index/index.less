@@ -1,0 +1,967 @@
+// 首页以 750 设计稿尺寸编写，交由 Taro 转为小程序 rpx 和 RN 尺寸。
+@red: #ff454c;
+@background: #f5f5f5;
+@ink: #292929;
+
+.home-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: @background;
+    overflow: hidden;
+}
+
+// 主滚动视口由有界父容器分配高度，避免百分比高度与 Flex 同时参与原生布局。
+.home-scroll {
+    flex: 1;
+    min-height: 0;
+}
+
+.native-status-inset {
+    flex-shrink: 0;
+    background-color: #aa9a83;
+}
+
+.native-bottom-inset {
+    flex-shrink: 0;
+    background-color: @background;
+}
+
+.home-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+// 自定义店铺导航只绘制应用内容，状态栏与微信胶囊由宿主平台提供。
+.store-header {
+    background-color: #aa9a83;
+}
+
+.store-title-row {
+    height: 88px;
+    padding-left: 24px;
+    padding-right: 24px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.store-title {
+    color: #ffffff;
+    font-size: 34px;
+    font-weight: 600;
+}
+
+.search-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 24px 24px;
+}
+
+.search-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 1;
+    height: 62px;
+    border-radius: 36px;
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+.search-trigger {
+    padding: 12px 12px 12px 24px;
+    flex-shrink: 0;
+}
+
+.search-icon {
+    width: 32px;
+    height: 32px;
+    opacity: 0.4;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 0;
+    height: 62px;
+    font-size: 28px;
+    color: @ink;
+    padding: 0;
+}
+
+.search-clear {
+    padding: 14px;
+}
+
+.message-button {
+    width: 112px;
+    height: 62px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.hero-frame {
+    margin: 0 24px;
+    padding-bottom: 20px;
+    height: 248px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.hero-swiper {
+    width: 100%;
+    height: 248px;
+}
+
+.hero-slide {
+    width: 100%;
+    height: 248px;
+}
+
+.hero-image {
+    width: 100%;
+    height: 248px;
+}
+
+.home-content {
+    padding: 0 24px;
+}
+
+.shortcut-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 36px 0 28px;
+}
+
+.shortcut-item {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.shortcut-circle {
+    width: 94px;
+    height: 94px;
+    border-radius: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-width: 5px;
+    border-style: solid;
+}
+
+.shortcut-red {
+    background-color: #ff5466;
+    border-color: #ff8793;
+}
+
+.shortcut-orange {
+    background-color: #ff8d2c;
+    border-color: #ffb06b;
+}
+
+.shortcut-blue {
+    background-color: #589ef7;
+    border-color: #88b9fc;
+}
+
+.shortcut-green {
+    background-color: #20c995;
+    border-color: #6bdfbd;
+}
+
+.shortcut-purple {
+    background-color: #aa5bf4;
+    border-color: #c18bfb;
+}
+
+.shortcut-icon {
+    width: 64px;
+    height: 64px;
+}
+
+.shortcut-label {
+    font-size: 26px;
+    color: #454545;
+    margin-top: 12px;
+}
+
+.promo-banner {
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.promo-image {
+    width: 100%;
+    height: 176px;
+}
+
+.campaign-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.campaign-card {
+    width: 31%;
+    height: 248px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.campaign-image {
+    width: 100%;
+    height: 248px;
+}
+
+.brand-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.brand-entry {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 48.3%;
+    height: 86px;
+    background-color: #ffe3e1;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.brand-title {
+    font-size: 31px;
+    font-weight: 600;
+    color: @red;
+    margin-left: 20px;
+}
+
+.brand-arrow {
+    width: 42px;
+    height: 42px;
+    border-radius: 22px;
+    background-color: @red;
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-arrow-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.deals-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.appliance-deal {
+    width: 48.3%;
+    height: 248px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    background-color: #b7d3c2;
+}
+
+.appliance-image {
+    width: 100%;
+    height: 248px;
+}
+
+.appliance-caption {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.appliance-name {
+    font-size: 16px;
+    color: #164936;
+    font-weight: 600;
+}
+
+.appliance-price {
+    font-size: 25px;
+    color: #ffffff;
+    background-color: #249970;
+    padding: 4px 10px;
+    margin-top: 12px;
+}
+
+.clothing-deal {
+    width: 23%;
+    height: 248px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.clothing-image {
+    width: 100%;
+    height: 185px;
+}
+
+.deal-price {
+    color: @red;
+    font-size: 30px;
+    line-height: 44px;
+    padding: 10px 6px 8px;
+}
+
+// 团购大卡片保留橙红活动条和奶油色活动页签。
+.group-section {
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+.sale-tabs {
+    display: flex;
+    flex-direction: row;
+    height: 88px;
+    background-color: #fff1e1;
+    border-radius: 20px;
+}
+
+.sale-tab {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sale-tab-active {
+    background-color: #ffffff;
+    border-top-left-radius: 20px;
+    border-bottom-right-radius: 44px;
+}
+
+.sale-tab-text {
+    color: @ink;
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.sale-tab-text-active {
+    font-weight: 700;
+}
+
+.sale-tab-indicator {
+    position: absolute;
+    bottom: 22px;
+    width: 76px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: #ffd9a1;
+}
+
+.group-card {
+    padding: 22px 20px 26px;
+    background-color: #ffffff;
+    border-bottom-width: 1px;
+    border-bottom-color: #ededed;
+    border-bottom-style: solid;
+}
+
+.group-image {
+    width: 100%;
+    height: 286px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    vertical-align: top;
+}
+
+.group-ribbon {
+    height: 62px;
+    background-color: #ff7136;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
+    padding: 0 16px;
+}
+
+.ribbon-label {
+    color: #ffffff;
+    font-size: 26px;
+    line-height: 36px;
+    flex-shrink: 1;
+}
+
+.ribbon-count {
+    color: #ffe7a2;
+    font-size: 25px;
+    line-height: 36px;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.group-info {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 14px 0;
+}
+
+.product-title {
+    color: #202020;
+    font-size: 29px;
+    line-height: 39px;
+    height: 78px;
+    overflow: hidden;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.product-tags {
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+}
+
+.product-tag {
+    color: #999999;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 24px;
+    margin-right: 14px;
+}
+
+.product-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+}
+
+.price-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.group-price {
+    color: @red;
+    font-size: 45px;
+    line-height: 56px;
+}
+
+.currency {
+    font-size: 28px;
+}
+
+.product-currency {
+    font-size: 24px;
+}
+
+.member-price {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid #f1d8a7;
+    border-radius: 5px;
+    background-color: #fff8e9;
+    margin-top: 8px;
+    align-self: flex-start;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.member-icon-wrap {
+    background-color: #cfa06e;
+    padding: 3px 5px;
+}
+
+.member-icon {
+    width: 26px;
+    height: 28px;
+}
+
+.member-price-text {
+    color: #a56834;
+    font-size: 25px;
+    line-height: 34px;
+    padding: 0 8px;
+    flex-shrink: 1;
+}
+
+.group-actions {
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    margin-left: 12px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.cart-button {
+    width: 118px;
+    height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffeaed;
+}
+
+.cart-icon {
+    width: 46px;
+    height: 46px;
+}
+
+.buy-button {
+    width: 118px;
+    height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: @red;
+}
+
+.buy-button-reserved {
+    background-color: #b5a58f;
+}
+
+.buy-button-text {
+    font-size: 28px;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+// 分类区域使用横向滚动和双列 Flex，不依赖 RN 不支持的 CSS Grid。
+.catalog-section {
+    padding-top: 28px;
+}
+
+.category-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.category-scroll {
+    flex: 1;
+    min-width: 0;
+    height: 70px;
+}
+
+.category-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.category-item {
+    flex-shrink: 0;
+    padding: 8px 15px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    margin-right: 24px;
+}
+
+.category-item-active {
+    background-color: @red;
+}
+
+.category-text {
+    color: #303030;
+    font-size: 30px;
+    line-height: 40px;
+}
+
+.category-text-active {
+    color: #ffffff;
+}
+
+.category-toggle {
+    width: 54px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-panel {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 16px;
+    background-color: #ffffff;
+    border-radius: 12px;
+}
+
+.category-option {
+    width: 50%;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.tag-scroll {
+    height: 80px;
+}
+
+.tag-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.tag-item {
+    flex-shrink: 0;
+    padding: 18px 25px 18px 6px;
+}
+
+.tag-text {
+    color: #535353;
+    font-size: 27px;
+    line-height: 36px;
+}
+
+.tag-text-active {
+    color: @red;
+}
+
+.product-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.product-card {
+    width: 48.3%;
+    flex-shrink: 0;
+    border-radius: 18px;
+    background-color: #ffffff;
+    overflow: hidden;
+    margin-bottom: 26px;
+}
+
+.product-image {
+    width: 100%;
+    height: 338px;
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 16px 18px;
+}
+
+.product-price {
+    color: @red;
+    font-size: 33px;
+    line-height: 42px;
+}
+
+.add-button {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    margin-left: 8px;
+    background-color: @red;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-icon {
+    width: 43px;
+    height: 43px;
+}
+
+.catalog-end {
+    display: flex;
+    color: #b7b7b7;
+    font-size: 24px;
+    text-align: center;
+    padding: 6px 0 60px;
+}
+
+.search-summary {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+}
+
+.search-summary-text {
+    color: #555555;
+    font-size: 25px;
+    flex: 1;
+}
+
+.reset-search {
+    color: @red;
+    font-size: 26px;
+    padding: 8px;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 90px 20px;
+    background-color: #ffffff;
+    border-radius: 18px;
+}
+
+.empty-icon {
+    width: 74px;
+    height: 74px;
+    opacity: 0.25;
+    margin-bottom: 22px;
+}
+
+.empty-title {
+    color: @ink;
+    font-size: 30px;
+}
+
+.empty-description {
+    color: #999999;
+    font-size: 25px;
+    margin-top: 12px;
+}
+
+.empty-reset {
+    background-color: @red;
+    border-radius: 12px;
+    padding: 18px 36px;
+    margin-top: 30px;
+}
+
+.image-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #eee9e2;
+}
+
+.image-fallback-text {
+    color: #958875;
+    font-size: 22px;
+    margin-top: 16px;
+    text-align: center;
+}
+
+// 浮层相对首页容器定位，避免 fixed 定位在 RN 中失效。
+.floating-cart {
+    position: absolute;
+    right: 28px;
+    bottom: 60px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    background-color: #ffffff;
+    border: 1px solid #f4d7d7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-cart-icon {
+    width: 54px;
+    height: 54px;
+}
+
+.cart-badge {
+    position: absolute;
+    right: 0;
+    top: 0;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 5px;
+    border-radius: 18px;
+    background-color: @red;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-badge-text {
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.home-toast {
+    position: absolute;
+    bottom: 48px;
+    left: 145px;
+    right: 145px;
+    border-radius: 14px;
+    background-color: rgba(38, 38, 38, 0.82);
+    padding: 20px 16px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+}
+
+.home-toast-text {
+    color: #ffffff;
+    font-size: 28px;
+    text-align: center;
+}
+
+.cart-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 20;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.cart-backdrop {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.cart-sheet {
+    background-color: #ffffff;
+    border-top-left-radius: 32px;
+    border-top-right-radius: 32px;
+    padding: 24px;
+}
+
+.cart-heading {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 24px;
+}
+
+.cart-heading-text {
+    font-size: 34px;
+    font-weight: 600;
+    color: @ink;
+}
+
+.sheet-close {
+    padding: 8px;
+}
+
+.cart-list {
+    height: 560px;
+}
+
+.cart-empty {
+    color: #999999;
+    font-size: 28px;
+    padding: 70px 20px;
+}
+
+.cart-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 22px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cart-product-image {
+    width: 120px;
+    height: 148px;
+    border-radius: 10px;
+}
+
+.cart-product-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 0 18px;
+}
+
+.cart-product-name {
+    color: @ink;
+    font-size: 25px;
+    line-height: 34px;
+    height: 68px;
+    overflow: hidden;
+}
+
+.quantity-control {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.quantity-button {
+    padding: 12px 6px;
+}
+
+.quantity-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.quantity-text {
+    color: @ink;
+    font-size: 28px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.cart-total-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 24px;
+}
+
+.cart-total-label {
+    color: #555555;
+    font-size: 28px;
+}
+
+.continue-button {
+    padding: 20px 40px;
+    border-radius: 14px;
+    background-color: @red;
+}

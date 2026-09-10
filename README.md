@@ -246,7 +246,9 @@ brew install cocoapods
 pnpm podInstall
 ```
 
-先安装 pnpm 依赖，再安装 Pods。添加或升级带 iOS 原生代码的依赖后，重新执行 `pnpm podInstall`。删除并重装 `node_modules` 后，即使 `ios/Pods` 还在，也需要再执行一次：React Native 的部分 Codegen 文件生成在 `node_modules` 内，重装依赖后必须重新生成并同步 Pods 工程。
+先安装 pnpm 依赖，再安装 Pods。`pnpm ios` 会先执行 `pod-install`，同步原生依赖与工程路径，成功后才运行 `react-native run-ios`；`--no-packager`、`--simulator` 等参数仍传给启动命令。也可单独执行 `pnpm podInstall`。
+
+pnpm 安装依赖时可能改变 React Native 的实际目录，导致 `rncore/EventEmitters.h file not found`。RN 0.73 的 `pod install` 只准备 Codegen 占位文件，真正的内容由 Xcode 的 `Generate Specs` 阶段生成。如果新目录中的文件为空，而 Xcode 沿用了旧的增量记录，还会出现 `SafeAreaViewProps` 未定义。`ios/Podfile` 已将 `React-rncore` 和 `FBReactNativeSpec` 的生成阶段设为每次执行，确保编译前生成完整定义；此配置会增加少量代码生成耗时。
 
 ### 3. 启动 iOS
 
