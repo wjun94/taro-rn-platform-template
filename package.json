@@ -28,7 +28,7 @@
     "dev:qq": "npm run build:qq -- --watch",
     "dev:jd": "npm run build:jd -- --watch",
     "dev:quickapp": "npm run build:quickapp -- --watch",
-    "android": "react-native run-android",
+    "android": "node scripts/run-android.cjs",
     "build:android": "cd android && ./gradlew app:assembleRelease",
     "ios": "react-native run-ios",
     "start": "react-native start --custom-log-reporter-path @tarojs/rn-supporter/TerminalReporter.js",

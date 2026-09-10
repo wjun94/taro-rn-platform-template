@@ -102,25 +102,29 @@ sdk.dir=/Users/你的用户名/Library/Android/sdk
 
 该文件已被 Git 忽略，不应提交给其他开发者使用。环境变量说明见 [Android 官方文档](https://developer.android.com/tools/variables)。
 
-### 3. 启动设备
+### 3. 准备设备
 
-在 Android Studio 的 Device Manager 中创建并启动模拟器，或连接已开启 USB 调试并授权的 Android 真机。确认设备状态为 `device`：
+首次使用时，在 Android Studio 的 Device Manager 中创建模拟器并下载对应系统镜像，或连接已开启 USB 调试并授权的 Android 真机。本机已有 `Taro_Pixel_8_API_34`，无需重新创建。
 
-```sh
-adb devices
-```
+### 4. 运行开发版（macOS / Windows 通用）
 
-本机已创建 `Taro_Pixel_8_API_34`，可直接启动：
+在项目根目录执行同一条命令即可：
 
 ```sh
-emulator -avd Taro_Pixel_8_API_34
+pnpm android
 ```
 
-其他机器先运行 `emulator -list-avds` 查看自己的模拟器名称。
+命令通过 [scripts/run-android.cjs](scripts/run-android.cjs) 自动准备设备，再调用项目内的 React Native CLI：
 
-### 4. 运行开发版
+- 优先使用第一个已连接设备；如果模拟器已连接但仍在启动，则等待它就绪。
+- 没有设备时，自动启动 `emulator -list-avds` 返回的第一个模拟器。没有已创建的模拟器时会提示先在 Device Manager 中创建，不会自动下载镜像。
+- 等待 Android 开机完成，最长三分钟，再开始构建、安装和启动 App；模拟器启动失败时显示临时日志文件路径。
+- 自动查找 SDK：依次检查 `android/local.properties` 的 `sdk.dir`、`ANDROID_HOME`、`ANDROID_SDK_ROOT`、系统默认 SDK 目录和 PATH。已有 `sdk.dir` 无效时提示修正，防止脚本与 Gradle 使用不同 SDK。
+- SDK 默认目录为 macOS 的 `~/Library/Android/sdk` 和 Windows 的 `%LOCALAPPDATA%/Android/Sdk`。自动设置仅作用于当前命令及其子进程，不修改系统环境变量；仍需安装 JDK 17、Android SDK Platform-Tools 和 Android Emulator。
 
-终端一启动 Metro，并保持运行：
+Windows 的 PowerShell、CMD 均可使用 `pnpm android`。自定义 SDK 路径可以在本机 `android/local.properties` 中使用正斜杠，例如 `sdk.dir=C:/Users/你的用户名/AppData/Local/Android/Sdk`。模拟器命令参数参考 [Android 官方说明](https://developer.android.com/studio/run/emulator-commandline)。
+
+也可在终端一单独启动 Metro，并保持运行：
 
 ```sh
 pnpm dev:rn
@@ -132,7 +136,7 @@ pnpm dev:rn
 pnpm android --no-packager
 ```
 
-多个设备在线时，用 `adb devices` 中的 ID 指定设备。例如，本机模拟器可只构建当前架构，缩短开发构建时间：
+原有 React Native 参数继续透传。多个设备在线时，用 `adb devices` 中的 ID 指定设备（显式指定 ID 时只等待该设备，不自动启动其他模拟器）。例如，本机模拟器可只构建当前架构，缩短开发构建时间：
 
 ```sh
 pnpm android --no-packager --deviceId emulator-5554 --active-arch-only
