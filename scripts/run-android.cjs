@@ -6,8 +6,6 @@ const { execFileSync, spawn } = require('node:child_process')
 const projectRoot = path.resolve(__dirname, '..')
 const isWindows = process.platform === 'win32'
 const executableSuffix = isWindows ? '.exe' : ''
-const args = process.argv.slice(2)
-if (args[0] === '--') args.shift()
 // 冷启动可能较慢，最多等待三分钟；每次查询也单独限制耗时。
 const bootTimeoutMs = 180_000
 const pollIntervalMs = 2_000
@@ -154,6 +152,8 @@ async function runReactNative(cliArgs, env) {
 
 /** 优先使用现有设备；没有设备时启动第一个 AVD，再交给原有 CLI 构建、安装及启动应用。 */
 async function main() {
+  const args = process.argv.slice(2)
+  if (args[0] === '--') args.shift()
   if (args.includes('--help') || args.includes('-h')) return runReactNative(args, process.env)
   const context = configureSdk()
   // 显式交互选机仍由 CLI 管理，保留原有命令行为。
@@ -182,8 +182,103 @@ async function main() {
   await runReactNative(requestedId ? args : [...args, '--deviceId', deviceId], context.env)
 }
 
-main().catch(error => {
-  console.error(`[android] ${error.message}`)
-  if (error.stderr) console.error(String(error.stderr).trim())
-  process.exitCode = 1
-})
+/** 仅在 Metro 加载时引入终端依赖，避免直接启动安卓时注册快捷键或开启终端 raw 模式。 */
+function createMetroReporter() {
+  const { createRequire } = require('node:module')
+  const TaroReporter = require('@tarojs/rn-supporter/TerminalReporter.js')
+
+  // 复用 RN 自带的 WebSocket 依赖，将刷新和开发菜单指令发给 Metro 已连接的应用。
+  const requireFromReactNative = createRequire(require.resolve('react-native/package.json'))
+  const WebSocket = requireFromReactNative('ws')
+
+  /** 保留 Taro 配置热更新与二维码功能，为 Metro 提供项目自己的启动快捷键。 */
+  class MetroReporter extends TaroReporter {
+    /** 记录当前服务端口和启动任务，防止重复按键同时启动多个模拟器或构建。 */
+    constructor(terminal) {
+      super(terminal)
+      this.port = 8081
+      this.launchTask = null
+      this.onKeypress = this.handleKeypress.bind(this)
+      this.onStop = () => {
+        process.stdin.off('keypress', this.onKeypress)
+        this.launchTask?.kill('SIGTERM')
+        if (process.stdin.isTTY) process.stdin.setRawMode(false)
+      }
+      process.once('exit', this.onStop)
+    }
+
+    /** 服务就绪后才启用按键；父类继续处理 Taro 入口缓存更新和日志输出。 */
+    async update(event) {
+      await super.update(event)
+      if (event.type === 'initialize_started') this.port = event.port ?? this.port
+      if (event.type !== 'initialize_done' || !process.stdin.isTTY || this.keysAttached) return
+      this.keysAttached = true
+      process.stdin.on('keypress', this.onKeypress)
+      process.stdin.resume()
+      console.log('\n a - 启动安卓（自动打开模拟器）\n i - 启动 iOS\n r - 刷新应用\n d - 开发菜单\n q - 显示二维码\n Ctrl+C - 停止服务\n')
+    }
+
+    /** 安卓复用跨平台设备准备脚本；iOS 和调试快捷键保持原有用途。 */
+    handleKeypress(text, key = {}) {
+      if (key.ctrl && (key.name === 'c' || key.name === 'd')) {
+        process.emit('SIGINT')
+        process.exit(0)
+      }
+      if (key.ctrl || key.meta) return
+      if (text === 'a') this.launch('android')
+      if (text === 'i') this.launch('ios')
+      if (text === 'r') this.broadcast('reload')
+      if (text === 'd') this.broadcast('devMenu')
+    }
+
+    /** 直接用 Node 启动本地脚本，兼容 Windows 路径；安装使用当前 Metro 端口。 */
+    launch(platform) {
+      if (this.launchTask) {
+        console.log('[start] 正在启动应用，请等待当前任务完成。')
+        return
+      }
+      const command = platform === 'android'
+        ? [__filename]
+        : [require.resolve('react-native/cli.js'), 'run-ios']
+      const child = spawn(process.execPath, [...command, '--no-packager', '--port', String(this.port)], {
+        cwd: projectRoot,
+        env: process.env,
+        stdio: ['ignore', 'inherit', 'inherit']
+      })
+      this.launchTask = child
+      child.once('error', error => console.error(`[start] 启动失败：${error.message}`))
+      child.once('close', code => {
+        this.launchTask = null
+        if (code) console.error(`[start] ${platform} 启动失败（退出码 ${code}），请查看上方日志。`)
+      })
+    }
+
+    /** 按 Metro 消息协议广播调试指令，连接超时或失败时保留终端供用户重试。 */
+    broadcast(method) {
+      const secure = process.argv.includes('--https')
+      const socket = new WebSocket(`${secure ? 'wss' : 'ws'}://localhost:${this.port}/message`, {
+        handshakeTimeout: 5000
+      })
+      socket.once('open', () => {
+        socket.send(JSON.stringify({ version: 2, method, params: null }), error => {
+          if (error) console.error(`[start] 指令发送失败：${error.message}`)
+          socket.close()
+        })
+      })
+      socket.once('error', error => console.error(`[start] 无法连接 Metro：${error.message}`))
+    }
+  }
+
+  return MetroReporter
+}
+
+// 直接执行时准备安卓设备；作为 reporter 加载时只导出类，按 a 后在子进程复用本文件。
+if (require.main === module) {
+  main().catch(error => {
+    console.error(`[android] ${error.message}`)
+    if (error.stderr) console.error(String(error.stderr).trim())
+    process.exitCode = 1
+  })
+} else {
+  module.exports = createMetroReporter()
+}
