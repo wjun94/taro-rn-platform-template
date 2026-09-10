@@ -1,0 +1,9 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "taro-app-demo",
+  "appid": "touristappid",
+  "setting": {
+    "es6": false,
+    "minified": false
+  }
+}
