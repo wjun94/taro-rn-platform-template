@@ -13,10 +13,11 @@ export default class Index extends Component<PropsWithChildren> {
 
   componentDidHide () { }
 
+  // 首页示例：通过 Tailwind 工具类设置间距、背景与文字样式。
   render () {
     return (
-      <View className='index'>
-        <Text>你好!</Text>
+      <View className='index flex flex-col p-4 bg-slate-100'>
+        <Text className='text-xl text-[#7f1d1d]'>你好11!</Text>
       </View>
     )
   }

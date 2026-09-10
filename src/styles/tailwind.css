@@ -1,0 +1,3 @@
+/* 只生成组件和工具类，避免浏览器 Preflight 重置进入 RN 样式转换。 */
+@tailwind components;
+@tailwind utilities;

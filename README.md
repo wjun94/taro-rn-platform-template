@@ -8,6 +8,7 @@
 
 - [技术栈与环境](#技术栈与环境)
 - [安装依赖](#安装依赖)
+- [Tailwind 样式](#tailwind-样式)
 - [Android 环境与运行](#android-环境与运行)
 - [Android 打包](#android-打包)
 - [iOS 环境与运行](#ios-环境与运行)
@@ -50,6 +51,39 @@ pnpm install --frozen-lockfile
 统一使用 pnpm 和现有锁文件。Android 原生构建也依赖 `node_modules`：Gradle 会从其中加载 React Native 插件和自动链接脚本。
 
 当前项目已声明所需原生模块。日常安装无需执行 `pnpm upgradePeerdeps`；该脚本会修改依赖并触发 Pods 安装，仅在有计划地调整 Taro / 原生模块依赖时使用。
+
+Webpack 固定为 `5.91.0`，与 Taro 4.2.1 的 `@tarojs/webpack5-runner` peer dependency 一致。不要单独将其改为宽松版本范围：Webpack 5.110.3 与当前 `webpackbar 5.0.2` 存在选项校验冲突，会在小程序启动阶段报 `ProgressPlugin ... unknown property 'name'`。已检查配套版本的插件初始化，未运行构建验证。
+
+## Tailwind 样式
+
+项目使用 **Tailwind CSS 3.4.19 + Taro 自带 PostCSS 流程**，配置文件为 [tailwind.config.js](tailwind.config.js)。依赖随 `pnpm install` 安装，不需要额外执行 Tailwind 构建命令。接入方式参考 [Taro 官方 Tailwind 文档](https://docs.taro.zone/docs/tailwindcss/)，本项目另外限制了 RN 可用的基础工具类范围。
+
+- `config/index.ts` 在 RN、H5 和小程序中加载 Tailwind，并为 RN 开启多 `className` 合并。
+- 小程序通过 `weapp-tailwindcss@3.7.0` 同步转义 JS、模板和 WXSS 中的特殊类名，并按 `1rem = 32rpx` 转换默认字号和间距；仅在 `mini.webpackChain` 注册，不参与 H5 或 RN 转换。`postinstall` 执行官方的 `weapp-tw patch`，让插件读取 Tailwind 3 生成的类名集合。
+- RN 通过 `scripts/tailwind-rn-transformer.cjs` 兼容独立的转义类选择器：在 Taro 解析 CSS 时使用临时别名，生成 StyleSheet 后恢复原始类名，支持 `text-[#7f1d1d]`、`w-[100px]` 等写法。
+- `src/styles/tailwind.css` 在 `src/app.ts` 中全局引入；RN 启动时由 `scripts/watch-tailwind.cjs` 生成对应的 `tailwind.rn.css`，Taro 会自动选择 RN 入口。生成文件已被 Git 忽略，不要手动编辑；现有 Less 可继续用于业务样式。
+- 默认提供 Flex 布局、间距、宽高、背景色、边框、圆角及文字等基础工具类，关闭 Preflight、阴影、滤镜、变换和颜色透明度变量等输出。
+- 字号、间距和圆角沿用 Tailwind 默认主题，不再自定义 `fontSize`、`spacing`、`borderRadius`。例如 `p-4` 为 `1rem`、`text-xl` 为 `1.25rem`，RN 转换器按 `1rem = 16px` 解析，再按 Taro 原生样式逻辑处理。`text-red-900` 是默认颜色类；`text-20px` 不是默认字号类，应使用 `text-xl` 等已有类名。
+
+页面示例：
+
+```tsx
+<View className='flex flex-col p-4 bg-slate-100 rounded-lg'>
+  <Text className='text-xl font-bold text-red-900'>你好!</Text>
+</View>
+```
+
+RN 可使用完整的普通类名和任意值类名，例如 `<Text className='text-xl text-[#7f1d1d]'>你好!</Text>`。任意值仍受 RN 支持的属性、单位和颜色格式限制，CSS 变量、`calc()` 等浏览器能力不因此获得支持。`hover:`、`dark:`、响应式前缀、`group-*`、后代选择器，以及 `grid`、`fixed`、`sticky` 等浏览器布局仍不在支持范围内。状态样式用条件切换完整类名，例如 `active ? 'text-[#7f1d1d]' : 'text-slate-900'`；不要拼接 `bg-${color}-500`，Tailwind 扫描无法识别这类动态名称。
+
+微信小程序可以保留 `<Text className='text-xl text-[#7f1d1d]'>你好!</Text>` 的源码写法，适配插件会统一处理特殊字符。接入后停止原来的小程序开发进程，再运行 `pnpm dev:weapp`，在微信开发者工具中重新编译。若安装时跳过了生命周期脚本，先执行 `pnpm exec weapp-tw patch`。
+
+首次接入 Tailwind 或修改 `config/index.ts` 后，必须停止原有 Metro，再执行 `pnpm start --reset-cache` 并重新加载 App。Taro 在进程内缓存项目配置，仅在模拟器中 Reload 不会重新加载 PostCSS 插件；旧进程会将未展开的 `@tailwind` 指令直接交给 RN 解析，出现 `tailwind.css: undefined:4:1: missing '{'` 和 Metro 500 错误。此时不需要重新构建 Android / iOS 原生工程。
+
+Tailwind 扫描 `src` 下的 JS / TS / JSX / TSX 文件。Metro 内的文件监听会在源码、Tailwind 配置或样式入口变化后，更新 `tailwind.rn.css` 的内容指纹，触发 RN 样式重新转换；因此新增 `text-red-900` 等类名时无需每次重启 Metro。安装此监听配置后需先重启 Metro 一次（`pnpm start --reset-cache`）。监听不启动额外进程；生产模式只在 Metro 加载配置时同步一次入口。
+
+已单独检查 Tailwind CSS 到 RN StyleSheet 的内存转换，并复现旧配置未加载插件时的解析错误；未执行 RN、H5 或小程序构建验证，各端界面仍需在实际运行时确认。
+
+若任意值类名未生效，确认 Metro 已加载新的 RN 转换器：停止旧服务并运行 `pnpm start --reset-cache`，再 Reload。已用当前页面单独确认 `text-[#7f1d1d]` 在转换后保留为同名 StyleSheet 键，颜色为 `#7f1d1d`。
 
 ## Android 环境与运行
 

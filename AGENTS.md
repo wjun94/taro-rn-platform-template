@@ -4,7 +4,7 @@
 
 ## 项目约定
 
-- 使用现有的 Taro、React、React Native、TypeScript 和 Less 技术栈，依赖版本以 `package.json` 与 `pnpm-lock.yaml` 为准。
+- 使用现有的 Taro、React、React Native、TypeScript、Tailwind CSS 3 和 Less 技术栈，依赖版本以 `package.json` 与 `pnpm-lock.yaml` 为准。
 - 统一使用 pnpm，保留现有锁文件，不混用 npm / yarn 生成新的锁文件。
 - 开始修改前阅读相关页面、组件和配置，沿用既有目录结构、命名、缩进与代码风格。
 - 只修改与当前需求相关的内容，不顺带重构、升级依赖或批量格式化无关文件。
@@ -46,7 +46,8 @@ export function formatPrice(amountInCents: number): string {
 - 提交、保存等异步操作防止重复触发，结束后恢复交互状态；表单包含必要校验与明确错误反馈。
 - 列表使用稳定且唯一的 key；长列表、图片和频繁更新的区域按实际需要优化，避免无依据地添加缓存或记忆化。
 - 异步请求、订阅、定时器和事件监听应处理清理与竞态，避免页面卸载后继续更新状态。
-- 样式优先放入对应 Less 文件，复用通用颜色、间距和字号，减少重复样式与无必要的全局覆盖。
+- 基础布局和视觉样式可使用 `tailwind.config.js` 中已配置的工具类，业务专属样式放入对应 Less 文件；复用通用颜色、间距和字号。
+- Tailwind 使用完整类名，条件样式切换完整字符串，不动态拼接类名。RN 已通过 `scripts/tailwind-rn-transformer.cjs` 兼容 `text-[#7f1d1d]` 等任意值和转义类名，但属性和值仍须为 RN 支持的样式；伪类及浏览器专属布局不在支持范围内。小程序通过 `mini.webpackChain` 中的 `weapp-tailwindcss` 同步转义 JS、模板和 WXSS 类名，依赖安装后由官方 `weapp-tw patch` 准备 Tailwind 类名提取；不要将小程序转义插件加入 RN 或 H5，具体限制见 README。
 - 适配移动端安全区、键盘遮挡、滚动、小屏幕与文字溢出，交互元素提供清晰反馈和必要的无障碍标识。
 
 ## 跨端与数据处理

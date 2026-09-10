@@ -1,7 +1,17 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
+import path from 'node:path'
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
+import { UnifiedWebpackPluginV5 } from 'weapp-tailwindcss/webpack'
 import devConfig from './dev'
 import prodConfig from './prod'
+
+// 各端统一通过 Taro 的 PostCSS 扩展加载 Tailwind，配置路径不依赖命令执行目录。
+const tailwindPostcss = {
+  tailwindcss: {
+    enable: true,
+    config: { config: path.resolve(__dirname, '../tailwind.config.js') }
+  }
+}
 
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
 export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
@@ -33,6 +43,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
     },
     mini: {
       postcss: {
+        ...tailwindPostcss,
         pxtransform: {
           enable: true,
           config: {
@@ -49,6 +60,14 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       },
       webpackChain(chain) {
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
+        // 同步转义 JS、模板和 WXSS 中的特殊类名，让小程序支持 text-[#7f1d1d] 等任意值。
+        chain.plugin('weapp-tailwindcss').use(UnifiedWebpackPluginV5, [{
+          appType: 'taro',
+          tailwindcssBasedir: path.resolve(__dirname, '..'),
+          cssPreflight: false,
+          // 小程序不支持 rem，将 Tailwind 默认间距和字号转换为 rpx。
+          rem2rpx: true
+        }])
       }
     },
     h5: {
@@ -64,6 +83,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         chunkFilename: 'css/[name].[chunkhash].css'
       },
       postcss: {
+        ...tailwindPostcss,
         autoprefixer: {
           enable: true,
           config: {}
@@ -83,6 +103,8 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
     rn: {
       appName: 'taroDemo',
       entry: 'app',
+      // 让 className 中的多个 Tailwind 工具类合并为 RN 样式。
+      enableMultipleClassName: true,
       output: {
         ios: './ios/main.jsbundle',
         iosAssetsDest: './ios',
@@ -96,6 +118,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         // androidSourcemapSourcesRoot: '',
       },
       postcss: {
+        ...tailwindPostcss,
         cssModules: {
           enable: false, // 默认为 false，如需使用 css modules 功能，则设为 true
         }

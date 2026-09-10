@@ -72,6 +72,9 @@ oh-package-lock.json5
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
 
+# Metro 启动时自动生成的 Tailwind RN 样式入口。
+/src/styles/tailwind.rn.css
+
 # testing
 /coverage
 
@@ -79,3 +82,5 @@ oh-package-lock.json5
 
 ## taro-react-native-release
 !release/** 
+
+dist
